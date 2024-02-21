@@ -13,3 +13,4 @@ Create 6 functions:
 - A power mod function, powmod(a,b,n) calculates a^b mod n
 
 Decided to make a class structure for these functions
+- private variables: 
