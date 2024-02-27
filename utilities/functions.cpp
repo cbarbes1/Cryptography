@@ -12,8 +12,9 @@ InfInt MOD(vector<InfInt> args)
 		result = result/args[1];
 		args[0] -= (result*args[1]);
 	}else{
-		result = args[0] + (int(log(-args[0].toInt()) / log(args[1].toInt())) * args[1].toInt());
-		args[0] = (args[1]+result);
+		args[0] = args[0]*-1;
+		result = args[0]%args[1];
+		args[0] = args[1] - result;
 	}
 	return args[0];
 }
@@ -31,11 +32,14 @@ InfInt GCD(vector<InfInt> args)
 		b = args[0];
 	}
 
-	vector<InfInt> equation = {a, 0, b, 1};
+	vector<InfInt> equation = {a, 1, b, 1};
+	
 	while(equation[3] != 0){
+		
 		equation[1] = equation[0] / equation[2];
-		equation[3] = equation[0] - equation[1];
+		equation[3] = equation[0] - (equation[1]*equation[2]);
 		equations.push_back(equation);
+		
 	}
 
 	return equation[2];
@@ -44,20 +48,20 @@ InfInt GCD(vector<InfInt> args)
 vector<InfInt> GCDEX(vector<InfInt> args)
 {
 
+	return {0};
 }
 
 vector<InfInt> ModInv(vector<InfInt> args)
 {
-
+	return {0};
 }
          
 vector<InfInt> CRT(vector<InfInt> args)
 {
-
-
+	return {0};
 }
  
 InfInt PowMod(vector<InfInt> args)
 {
-
+	return 0;
 }
