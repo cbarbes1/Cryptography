@@ -3,6 +3,12 @@
 ## Language chosen: C++
 The reason for the use of c++ is for ease of parallelism
 
+## Semester Project
+- Cluster setup with head node and 4 worker nodes
+- Obtained document on setting up cluster
+- Read about Different potential task that can be completed by the cluster
+- 
+
 ## Homework 4
 Create 6 functions:
 - Modulo function that works for positive and negative numbers
