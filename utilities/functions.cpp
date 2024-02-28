@@ -21,28 +21,30 @@ InfInt MOD(vector<InfInt> args)
 
 InfInt GCD(vector<InfInt> args)
 {
-	vector<vector<InfInt>> equations;
+	if(args.size() == 2){
+		InfInt a, b;
+		if(args[0] >= args[1]){
+			a = args[0];
+			b = args[1];
+		}else{
+			a = args[1];
+			b = args[0];
+		}
 
-	InfInt a, b;
-	if(args[0] >= args[1]){
-		a = args[0];
-		b = args[1];
-	}else{
-		a = args[1];
-		b = args[0];
+		while(b!=0){
+			InfInt temp = b;
+			b = a % b;
+			a = temp;
+		}
+		return a;
 	}
+	return args[0];
+}
 
-	vector<InfInt> equation = {a, 1, b, 1};
-	
-	while(equation[3] != 0){
-		
-		equation[1] = equation[0] / equation[2];
-		equation[3] = equation[0] - (equation[1]*equation[2]);
-		equations.push_back(equation);
-		
-	}
+InfInt GCDN(vector<InfInt> args)
+{
+//	for(int i = 0; i<args.size(); i++){
 
-	return equation[2];
 }
 
 vector<InfInt> GCDEX(vector<InfInt> args)
