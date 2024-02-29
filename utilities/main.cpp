@@ -35,6 +35,10 @@ int main()
 		printf("The Greatest Common Denominator GCD(%d, %d) = %d", values[0].toInt(), values[1].toInt(), output.toInt());
 	}else if(type == "GCDEX"){
 
+		vector<InfInt> values;
+		InfInt a, b;
+		cout<<"Please enter the "
+
 	}
 	return 0;
 }
