@@ -2,9 +2,10 @@
  * Author: Cole Barbes
  * Purpose: test different mathematical functions for cryptography 
  */
-#include "functions.h"
+#include "utilities.h"
 
 using namespace std;
+using namespace utilities;
 
 int main()
 {
@@ -37,8 +38,14 @@ int main()
 
 		vector<InfInt> values;
 		InfInt a, b;
-		cout<<"Please enter the "
+		cout<<"Please enter the first value ";
+		cin>>a;
+		cout<<"Please enter the second value ";
+		cin>>b;
 
+		values = GCDEX({a, b});
+		cout<<"The extended euclidean equation: "<<endl;
+		cout<<a<<"*"<<values[1]<<" + "<<b<<"*"<<values[2]<<endl;
 	}
 	return 0;
 }

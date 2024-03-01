@@ -3,16 +3,15 @@
 PROG = Prog
 CC = g++
 CPPFLAGS = -g -Wall -std=c++11
-OBJS =  main.o functions.o
+OBJS =  main.o utilities.o
 
 $(PROG) : $(OBJS)
 	$(CC) -o $(PROG) $(OBJS)
 
-main.o : main.cpp
+utilities.o : utilities.h utilities.cpp InfInt.h
+	$(CC) $(CPPFLAGS) -c utilities.cpp
+main.o : main.cpp 
 	$(CC) $(CPPFLAGS) -c main.cpp
-
-functions.o : functions.h functions.cpp
-	$(CC) $(CPPFLAGS) -c functions.cpp
 
 clean:
 	rm -f core $(PROG) $(OBJS)
