@@ -1,3 +1,9 @@
+/*
+* Author: Cole Barbes
+* Purpose: library of functions for Cryptography
+* Date Created: 3/1/24
+* Last edited 3/1/24
+*/
 #ifndef utilities_H
 #define utilities_H
 
@@ -6,6 +12,7 @@
 #include "InfInt.h"
 #include <vector>
 
+// namespace for convenience
 namespace utilities {
 	using namespace std;
 
@@ -14,10 +21,9 @@ namespace utilities {
 	InfInt GCD(vector<InfInt>); // Greatest Common Divisor
 
 	vector<InfInt> GCDEX(vector<InfInt>); // Greatest Common Divisor Extended Equation will return s and t
-	vector<InfInt> ModInv(vector<InfInt>);
+	InfInt ModInv(vector<InfInt>);
 
-	vector<InfInt> CRT(vector<InfInt>);
-
+	InfInt CRT(vector<InfInt> values, vector<InfInt> mods, int i = 1);
 	InfInt PowMod(vector<InfInt>);
 }
 
