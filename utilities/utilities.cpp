@@ -104,7 +104,10 @@ InfInt utilities::ModInv(vector<InfInt> args)
 {
 	if(GCD(args) == 1){
 		vector<InfInt> exdGCD = GCDEX(args);
-		return exdGCD[1];
+		int index = 1;
+		if(args[0] < args[1])
+			index = 2;
+		return exdGCD[index];
 	}
 	else
 		return -1;
@@ -115,17 +118,17 @@ InfInt utilities::ModInv(vector<InfInt> args)
 */
 InfInt utilities::CRT(vector<InfInt> values, vector<InfInt> mods, int i)
 {
-	if(i == mods.size())
-		return values[i-1];
+	InfInt prod = 1;
+	for(int i = 0; i<mods.size(); i++)
+		prod *= mods[i];
 
-	if(GCD({mods[i-1], mods[i]}) != 1)
-		return -1;
-		
-	vector<InfInt> equation = GCDEX({mods[i-1], mods[i]});
-	InfInt x = MOD({values[i]*equation[1]*mods[i-1] + values[i-1]*equation[2]*mods[i], mods[i-1]*mods[i]});
-	values[i] = x;
-	mods[i] = mods[i-1]*mods[i];
-	return CRT(values, mods, i+1);
+	InfInt result = 0;
+	for(int i = 0; i<mods.size(); i++){
+		InfInt pp = prod / mods[i];
+		result += (values[i] * ModInv({pp, mods[i]}) * pp);
+	}
+
+	return MOD({result, prod});
 }
 
 /*
@@ -146,4 +149,178 @@ InfInt utilities::PowMod(vector<InfInt> args)
 		}
 	}
 	return b;
+}
+
+/*
+ * Fermats Theorem Primality Test 
+ * Parameter: Number to be checked
+ * Return True or false to whether it is prime
+ */
+bool utilities::FermatsTest(int p)
+{
+	// Thought Process For Project understanding purposes
+	// Iterative 
+	// while random number a ^ n-1 power is 1 mod n
+	// end loop if the var was switched to false
+	// end loop at ten then return true
+	//
+	srand(time(0));
+
+	bool checker = true;
+
+	for(int i = 0; i < 10 && checker != false; i++){
+		int randNum = (rand() % (p-3))+2;
+		InfInt result = PowMod({randNum, p-1, p});
+		cout<<randNum<<result<<endl;
+		if(result != 1)
+			checker = false;
+	}
+
+	return checker;
+}
+
+/*
+ * Eulers theorem to find the number of numbers that are co prime to p 
+ * Return: number of numbers coprime to p and list of them
+ */
+vector<InfInt> utilities::EulerPhi(InfInt p)
+{
+	InfInt count = 0;
+	vector<InfInt> result;
+	result.push_back(0);
+	for(InfInt i = 1; i<= p; i++){
+		InfInt gcd = GCD({i, p});
+		if(gcd == 1){
+			count++;
+			result.push_back(i);
+		}
+	}
+	result[0] = count;
+	return result;
+}
+
+/*
+ * Determine if a given number is a primitive root
+ * return: whether it is a primitive root or not
+ */
+bool utilities::prim_root(InfInt a, InfInt n)
+{
+	// use EulerPhi function to get 
+	//
+	if(GCD({a, n}) != 1)
+		return false;
+
+	vector<InfInt> powers = EulerPhi(n);
+	bool check = true;
+	for(unsigned int i = 1; i<powers.size() && check; i++){
+		InfInt result = PowMod({a, powers[i], n});
+		if(result == 1 && powers[i] != n-1)
+			check = false;
+	}
+
+	return check;
+}
+
+/*
+ * Find the sqrts in a certain modulus
+ */
+vector<InfInt> utilities::MOD_SQRT(InfInt a, InfInt p)
+{
+	vector<InfInt> output;
+	InfInt mod = MOD({p, 4});
+	if(LegendreSymbol(a, p) == -1 || mod != 3){
+		output.push_back(-1);
+	}else{
+		InfInt x = PowMod({a, (p+1)/4, p});
+		output.push_back(x);
+		output.push_back(-x);
+	}
+	return output;
+}
+
+/*
+ * Test if there is a sqrt in mod p
+ */
+InfInt utilities::LegendreSymbol(InfInt a, InfInt p)
+{
+	InfInt result;
+	if(MOD({a, p}) == 0){
+		result = 0;
+	}else{
+		result = PowMod({a, (p-1)/2, p});
+		if(result != 1)
+			result = result - p;
+	}
+	return result;
+}
+
+/*
+ * Test if there isnt a sqrt in mod n n being a composite
+ */     
+InfInt utilities::JacobiSymbol(InfInt a, InfInt n)
+{
+	if(GCD({a, n}) != 1)
+		return -1;
+
+	InfInt output = 1;
+
+	// if the number is less than 0 check if it is 3 mod 4 if it is then flip the sign
+	if(a < 0){
+		a = -a;
+		if(n%4 == 3){
+			output = -output;
+		}
+	}
+
+	while(a != 0){ // continually apply the rules until the result is found
+		while(a%2 == 0){
+			a/=2;
+			if(n%8 == 3 || n%8 == 5){ // rule 4  -1
+				output = -output;
+			}
+		}
+		if(a%2 == 1 && n%2 == 1){
+			InfInt temp = a;
+			a = n;
+			n = temp;
+			if(a%4 == 3 && n%4 == 3){ // rule 5
+				output = -output;
+			}
+		}
+		a = a%n;
+	}
+	return output;
+}
+
+/*
+ * Rational number continued fraction
+ */
+vector<InfInt> utilities::RCF(InfInt a, InfInt b)
+{
+	vector<InfInt> output;
+	while(b != 0){
+		InfInt num = a/b;
+		InfInt rem = MOD({a, b});
+		output.push_back(num);
+		a = b;
+		b = rem;
+	}
+
+	return output;
+}
+   
+/*
+ * Double number continued fraction
+ */
+vector<InfInt> utilities::DCF(double a, int n)
+{
+	InfInt a_value;
+	vector<InfInt> output;
+	for(int i = 0; i<n; i++){
+		a_value = static_cast<int>(a);
+		a = a - a_value.toInt();
+		a = 1/a;
+		output.push_back(a_value);
+	}
+	return output;
 }

@@ -8,30 +8,11 @@ using namespace std;
 using namespace utilities;
 
 /*
-* Answers to the Questions
-* 1. 
-*	GCD(8765, 23485)
-*	Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD)
-*	GCD
-*	Enter a value 0 :
-*	8765
-*	Enter a value 1 :
-*	23485
-*	The Greatest Common Denominator GCD(8765, 23485) = 5
-* 2. 
-*	65537*-1405 + 3511*26226 = 1
-* 	Not understanding this one
-* 4. 
-*	3^1234567
-*	last 5 digits: 40587
-* 8. 
-*	4856955
 */
-
 int main()
 {
 	string type;
-	cout<<"Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD)"<<endl;
+	cout<<"Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD, FermatsTest, EulerPhi, PrimRoot, MODSQRT, LSYM, JSYM, RCF, DCF)"<<endl;
 	cin>>type;
 	if(type == "MOD"){
 		InfInt value, n;
@@ -76,10 +57,15 @@ int main()
 		InfInt result =	ModInv({a, n});
 		cout<<"The inverse of "<<a<<" in MOD "<<n<<" is "<<result<<endl;
 	}else if(type == "CRT"){
-		// x = 17 (mod 101)
-		// x = 18 (mod 201)
-		// x = 19 (mod 301)
-		InfInt result = CRT({17, 18, 19}, {101, 201, 301});
+		InfInt val1;
+		InfInt val2;
+		InfInt mod1;
+		InfInt mod2;
+		cout<<"Please enter the first value followed by the mod: "<<endl;
+		cin>>val1>>mod1;
+		cout<<"Please enter the second value followed by the mod: "<<endl;
+		cin>>val2>>mod2;
+		InfInt result = CRT({val1, val2}, {mod1, mod2});
 		cout<<"The result of chinese remainder theorem: "<<result<<endl;
 	}else if(type == "POWMOD"){
 		InfInt a, b, n;
@@ -94,6 +80,99 @@ int main()
 
 		cout<<"The result of the exponentiation: "<<endl;
 		cout<<result<<endl;
+	}else if(type == "FermatsTest"){
+		int TestPrime = 0;
+		cout<<"Please enter a number to test its primality: "<<endl;
+		cin>>TestPrime;
+		if(FermatsTest(TestPrime)){
+			cout<<"The number "<<TestPrime<<" is a prime"<<endl;
+		}else{
+			cout<<"The number "<<TestPrime<<" is a composite and not a prime"<<endl;
+		}
+	}else if(type == "EulerPhi"){
+		InfInt InputNumber = 0;
+		cout<<"Please enter the number to find how many number that are relatively prime to it: "<<endl;
+		cin>>InputNumber;
+		vector<InfInt> output = EulerPhi(InputNumber);
+		cout<<"There are "<<output[0]<<" numbers relatively prime to "<<InputNumber<<endl;
+	}else if(type == "PrimRoot"){
+		InfInt InputNumber, mod;
+		cout<<"Please enter the number to check if it is a primitive root:"<<endl;
+		cin>>InputNumber;
+		cout<<"Please enter the mod you are working in: "<<endl;
+		cin>>mod;
+
+		if(prim_root(InputNumber, mod)){
+			cout<<"The number "<< InputNumber<<" is a primitive root mod"<<mod<<endl;
+		}else{
+			cout<<"Not a primitive root mod "<<mod<<endl;
+		}
+	}else if(type == "MODSQRT"){
+		InfInt a, p;
+		cout<<"Please enter the value you would like to get the sqrt"<<endl;
+		cin>>a;
+		cout<<"Please enter the modulus you are working in "<<endl;
+		cin>>p;
+
+		vector<InfInt> output = MOD_SQRT(a, p);
+
+		cout<<"The square roots of "<<a<<" in mod "<<p<<" are ";
+
+		for(unsigned int i = 0; i<output.size(); i++)
+			cout<<output[i]<<" ";
+		cout<<endl;
+	}else if(type == "LSYM"){
+		InfInt a, p;
+		cout<<"Please enter the value of a s.t x^2 is congruent to a (mod p) to test "<<endl;
+		cin>>a;
+		cout<<"Please enter the mod you are working in"<<endl;
+		cin>>p;
+		InfInt testval = LegendreSymbol(a, p);
+		if(testval == 1)
+			cout<<"The congruence x^2 congruent to "<<a<<" (mod "<<p<<") has a solution"<<endl;
+		else
+			cout<<"No solution to the congruence"<<endl;
+	}else if(type == "JSYM"){
+		InfInt a, n;
+
+		cout<<"Please enter the value you would like to test "<<endl;
+		cin>>a;
+		cout<<"Please enter the composite mod you want to work in "<<endl;
+		cin>>n;
+
+		InfInt result = JacobiSymbol(a, n);
+		if(result == 1)
+			cout<<"There is not results to find here since the jacobi symbol was 1"<<endl;
+		else
+			cout<<"Since jacobi symbol was "<<result<<", There is no square root mod "<<n<<endl;
+	}else if(type == "RCF"){
+		InfInt a, b;
+
+		cout<<"Please enter the numerator of the quotient "<<endl;
+		cin>>a;
+		cout<<"Please enter the denominator of the quotient "<<endl;
+		cin>>b;
+		
+		vector<InfInt> output = RCF(a, b);
+
+		for(unsigned int i = 0; i< output.size(); i++){
+			cout<<"a"<<i<<" : "<<output[i]<<endl;
+		}
+	}else if(type == "DCF"){
+		double a;
+		int n;
+		cout<<"What is value would you like to approximate? "<<endl;
+		cin>>a;
+		cout<<"Enter how many a value you want to approximate to :"<<endl;
+		cin>>n;
+
+		vector<InfInt> output = DCF(a, n);
+		int i = 0;
+		for(InfInt a : output){
+			i++;
+			cout<<"a"<<i<<" is "<<a<<endl;
+		}
 	}
+
 	return 0;
 }

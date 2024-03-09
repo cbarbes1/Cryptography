@@ -25,6 +25,22 @@ namespace utilities {
 
 	InfInt CRT(vector<InfInt> values, vector<InfInt> mods, int i = 1);
 	InfInt PowMod(vector<InfInt>);
+
+	bool FermatsTest(int); 
+
+	vector<InfInt> EulerPhi(InfInt);
+
+	bool prim_root(InfInt, InfInt);
+
+	vector<InfInt> MOD_SQRT(InfInt, InfInt);
+
+	InfInt LegendreSymbol(InfInt, InfInt);
+
+	InfInt JacobiSymbol(InfInt, InfInt);
+
+	vector<InfInt> RCF(InfInt a, InfInt b);
+
+	vector<InfInt> DCF(double, int);
 }
 
 #endif
