@@ -324,3 +324,11 @@ vector<InfInt> utilities::DCF(double a, int n)
 	}
 	return output;
 }
+
+/* Miller-Rabin Primality Test 
+ * Parameters: The number to be tested
+ * Return: True if the number is probably prime, False if the number is composite
+ */
+bool utilities::MR_Primality_Test(InfInt n){
+
+}

@@ -41,6 +41,8 @@ namespace utilities {
 	vector<InfInt> RCF(InfInt a, InfInt b);
 
 	vector<InfInt> DCF(double, int);
+
+	bool MR_Primality_Test(InfInt n);
 }
 
 #endif
