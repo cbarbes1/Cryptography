@@ -7,7 +7,7 @@
 #include "utilities.h"
 #include <vector>
 #include "InfInt.h"
-
+#include <map>
 using namespace std;
 
 /* Modulus funcion
@@ -329,6 +329,27 @@ vector<InfInt> utilities::DCF(double a, int n)
  * Parameters: The number to be tested
  * Return: True if the number is probably prime, False if the number is composite
  */
-bool utilities::MR_Primality_Test(InfInt n){
+bool utilities::MR_Primality_Test(InfInt n, int t){
 
+	srand(time(0));
+	map<InfInt, int> randints;
+	bool checker = false;
+	//write n-1 = 2^k*m
+	for(int i = 0; i<t; i++){
+		int randInt = rand()%(n-1).toInt()+1;
+		while(randints.find(randInt) != randints.end()){
+			randInt = rand()%(n-1).toInt()+1;
+		}
+		randints[randInt] = 1;
+
+		// b0 = a^m(mod n)
+		// if b0 = +-1(mod n) stop and declare n is prob prime
+		// otherwise, let b1 = b0^2(mod n).
+		// if b1 = 1 (mod n), then n is composite gcd(b0-1, n) gives a nontrivial factor of n
+		// if b1 = -1 (mod n), then n is prob prime
+		// otherwise, let b2 = b1^2(mod n) 
+		// if b2 = 1 (mod n) then n is composite
+		// if b2 = -1 (mod n) then n is prob prime
+		// continue until bk-1, if bk-1 != -1 (mod n) then n is composite
+	}
 }
