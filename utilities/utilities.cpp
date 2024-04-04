@@ -119,11 +119,11 @@ InfInt utilities::ModInv(vector<InfInt> args)
 InfInt utilities::CRT(vector<InfInt> values, vector<InfInt> mods, int i)
 {
 	InfInt prod = 1;
-	for(int i = 0; i<mods.size(); i++)
+	for(unsigned int i = 0; i<mods.size(); i++)
 		prod *= mods[i];
 
 	InfInt result = 0;
-	for(int i = 0; i<mods.size(); i++){
+	for(unsigned int i = 0; i<mods.size(); i++){
 		InfInt pp = prod / mods[i];
 		result += (values[i] * ModInv({pp, mods[i]}) * pp);
 	}
@@ -327,29 +327,50 @@ vector<InfInt> utilities::DCF(double a, int n)
 
 /* Miller-Rabin Primality Test 
  * Parameters: The number to be tested
- * Return: True if the number is probably prime, False if the number is composite
+ * Return: 1 if the number is probably prime, GCD(b-1, n) if the number is composite
  */
-bool utilities::MR_Primality_Test(InfInt n, int t){
+InfInt utilities::MR_Primality_Test(InfInt n, int t){
 
 	srand(time(0));
-	map<InfInt, int> randints;
-	bool checker = false;
+	InfInt m = n-1;
+	int k = 0;
+	InfInt b = 0;
+	InfInt b0 = 0;
+	while(m%2 == 0){
+		m=m/2;
+		k++;
+	}
+	cout<<m<<endl;
 	//write n-1 = 2^k*m
 	for(int i = 0; i<t; i++){
-		int randInt = rand()%(n-1).toInt()+1;
-		while(randints.find(randInt) != randints.end()){
-			randInt = rand()%(n-1).toInt()+1;
-		}
-		randints[randInt] = 1;
+		
+		InfInt randInt = rand()%t+1;
 
 		// b0 = a^m(mod n)
+		b = PowMod({randInt, m, n});
+		b0 = b;
+		
 		// if b0 = +-1(mod n) stop and declare n is prob prime
-		// otherwise, let b1 = b0^2(mod n).
-		// if b1 = 1 (mod n), then n is composite gcd(b0-1, n) gives a nontrivial factor of n
-		// if b1 = -1 (mod n), then n is prob prime
-		// otherwise, let b2 = b1^2(mod n) 
-		// if b2 = 1 (mod n) then n is composite
-		// if b2 = -1 (mod n) then n is prob prime
-		// continue until bk-1, if bk-1 != -1 (mod n) then n is composite
+		if(b == 1 || b == n-1)
+		 	return 1;
+		// otherwise, 
+
+		for(int j = 1; j<k; j++){
+			//let b1 = b0^2(mod n).
+			b = MOD({(b*b), n});
+			// if b1 = 1 (mod n), then n is composite gcd(b0-1, n) gives a nontrivial factor of n
+			if(b == 1){
+				return GCD({(b0-1), n});
+			}
+			// // if b1 = -1 (mod n), then n is prob prime
+			if(b == n-1)
+				return 1;
+			// otherwise, let b2 = b1^2(mod n) 
+			// if b2 = 1 (mod n) then n is composite
+			// if b2 = -1 (mod n) then n is prob prime
+			// continue until bk-1, if bk-1 != -1 (mod n) then n is composite
+			b0 = b;
+		}
 	}
+	return -1;
 }

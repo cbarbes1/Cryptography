@@ -173,7 +173,22 @@ int main()
 			cout<<"a"<<i<<" is "<<a<<endl;
 		}
 	}else if(type == "MR"){
-		MR_Primality_Test(1000, 100);
+		string number = "";
+		int t = 0;
+		cout<<"Please enter the number: "<<endl;
+		cin>>number;
+		cout<<"Please enter the stopping point of a values"<<endl;
+		cin>>t;
+		InfInt num = number;
+		InfInt tester = MR_Primality_Test(num, t);
+		if(tester == 1){
+			cout<<"The number is prime"<<endl;
+		}else if(tester >1){
+			cout<<"The number is composite"<<endl;
+			cout<<"Here is the factor(s) "<<tester<<" * "<<num/tester<<" = "<<number<<endl;
+		}else{
+			cout<<"Test was inconclusive"<<endl;
+		}
 	}
 
 	return 0;
