@@ -12,7 +12,7 @@ using namespace utilities;
 int main()
 {
 	string type;
-	cout<<"Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD, FermatsTest, EulerPhi, PrimRoot, MODSQRT, LSYM, JSYM, RCF, DCF)"<<endl;
+	cout<<"Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD, FermatsTest, EulerPhi, PrimRoot, MODSQRT, LSYM, JSYM, RCF, DCF, MR (Miller-Rabin))"<<endl;
 	cin>>type;
 	if(type == "MOD"){
 		InfInt value, n;
@@ -172,6 +172,8 @@ int main()
 			i++;
 			cout<<"a"<<i<<" is "<<a<<endl;
 		}
+	}else if(type == "MR"){
+		MR_Primality_Test(1000, 100);
 	}
 
 	return 0;

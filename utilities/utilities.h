@@ -42,7 +42,7 @@ namespace utilities {
 
 	vector<InfInt> DCF(double, int);
 
-	bool MR_Primality_Test(InfInt n);
+	bool MR_Primality_Test(InfInt n, int t);
 }
 
 #endif
