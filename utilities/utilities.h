@@ -23,16 +23,17 @@ namespace utilities {
 	vector<InfInt> GCDEX(vector<InfInt>); // Greatest Common Divisor Extended Equation will return s and t
 	InfInt ModInv(vector<InfInt>);
 
-	InfInt CRT(vector<InfInt> values, vector<InfInt> mods, int i = 1);
-	InfInt PowMod(vector<InfInt>);
+	InfInt CRT(vector<InfInt> values, vector<InfInt> mods, int i = 1); // chinese remainder theorem
 
-	bool FermatsTest(int); 
+	InfInt PowMod(vector<InfInt>);// power modulus
 
-	vector<InfInt> EulerPhi(InfInt);
+	bool FermatsTest(int); //fermat primality
 
-	bool prim_root(InfInt, InfInt);
+	vector<InfInt> EulerPhi(InfInt); //euler phi function
 
-	vector<InfInt> MOD_SQRT(InfInt, InfInt);
+	bool prim_root(InfInt, InfInt); // primitive roots
+
+	vector<InfInt> MOD_SQRT(InfInt, InfInt); // modulus sqrt
 
 	InfInt LegendreSymbol(InfInt, InfInt);
 
@@ -43,6 +44,10 @@ namespace utilities {
 	vector<InfInt> DCF(double, int);
 
 	InfInt MR_Primality_Test(InfInt n, int t);
+
+	vector<InfInt> PollardPM1(InfInt n, int bound); // pollard p-1 algorithm 
+
+	vector<InfInt> PollardRho(InfInt n); // pollard rho
 }
 
 #endif

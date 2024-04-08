@@ -12,7 +12,7 @@ using namespace utilities;
 int main()
 {
 	string type;
-	cout<<"Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD, FermatsTest, EulerPhi, PrimRoot, MODSQRT, LSYM, JSYM, RCF, DCF, MR (Miller-Rabin))"<<endl;
+	cout<<"Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD, FermatsTest, EulerPhi, PrimRoot, MODSQRT, LSYM, JSYM, RCF, DCF, MR (Miller-Rabin)), PM1(Pollard p-1), PRHO (Pollard Rho)"<<endl;
 	cin>>type;
 	if(type == "MOD"){
 		InfInt value, n;
@@ -189,6 +189,29 @@ int main()
 		}else{
 			cout<<"Test was inconclusive"<<endl;
 		}
+	}else if (type == "PM1"){
+		string number = "";
+		cout<<"Please enter the number to factor: "<<endl;
+		cin>>number;
+
+		InfInt num = number;
+		int bound = 100000;
+		vector<InfInt> output = PollardPM1(num, bound);
+		if(output[0] != -1)
+			cout<<"The factors of n = "<<num<<" is p = "<<output[0]<<" q = "<<output[1]<<endl;
+		else
+			cout<<"Pollard p-1 failed"<<endl;
+	}else if (type == "PRHO"){
+		string number = "";
+		cout<<"Please enter the number to factor: "<<endl;
+		cin>>number;
+
+		InfInt num = number;
+		vector<InfInt> output = PollardRho(num);
+		if(output[0] != -1)
+			cout<<"The factors of n = "<<num<<" is p = "<<output[0]<<" q = "<<output[1]<<endl;
+		else
+			cout<<"Pollard Rho failed"<<endl;
 	}
 
 	return 0;

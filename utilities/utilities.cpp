@@ -8,6 +8,7 @@
 #include <vector>
 #include "InfInt.h"
 #include <map>
+#include <cmath>
 using namespace std;
 
 /* Modulus funcion
@@ -340,7 +341,6 @@ InfInt utilities::MR_Primality_Test(InfInt n, int t){
 		m=m/2;
 		k++;
 	}
-	cout<<m<<endl;
 	//write n-1 = 2^k*m
 	for(int i = 0; i<t; i++){
 		
@@ -373,4 +373,60 @@ InfInt utilities::MR_Primality_Test(InfInt n, int t){
 		}
 	}
 	return -1;
+}
+
+/* 
+*	Pollard p-1 algorithm 
+*	Parameters: A number n to factor
+*	Return: A factor or -1 on failure
+*	Notes: pollard p-1 takes a number a and does the following a^(B!)(mod n) for a >1 and B 
+*/
+
+vector<InfInt> utilities::PollardPM1(InfInt n, int bound = INFINITY){
+	InfInt result = 2;
+	InfInt p = 1;
+	InfInt q = 1;
+	bool stop = false;
+	// from i = 2 -> i < bound
+	for(int i = 2; i<bound && !stop; i++){
+		result = PowMod({result, i, n});
+		p = GCD({result-1, n});
+
+		// if the result is a non-trivial factor then get the other factor and terminate
+		if(p > 1 && p < n){
+			stop = true;
+			q = n/p;
+		}
+	}
+
+	if(stop){ // if found then return the 2 factors
+		return {p, q};
+	}else return {-1};
+}
+/*	Pollard rho algorithm that uses cycle detection 
+*	Parameters: The number to be factored
+*	Return: the 2 factors if found and -1 if not found
+*/
+vector<InfInt> utilities::PollardRho(InfInt n){
+	InfInt x = "2", y = x, result = 0, q=0;
+	
+	int finder = 0;
+	while(finder != 1){
+		// floyds cycle detection f(x)
+		x = MOD({(x*x + 1), n}); 
+		// f(f(y))
+		y = MOD({((y*y + 1)*(y*y + 1) +1), n});
+
+		// if x-y is positive then use that, if negative then negate it
+		result = GCD({x-y > 0 ? x-y : -(x-y), n});
+		if(result > 1 && result < n){
+			finder = 1;
+			q = n/result;
+		}
+	}
+	// if success return the factors
+	if(finder == 1)
+		return {result, q};
+	else
+		return {-1};
 }
