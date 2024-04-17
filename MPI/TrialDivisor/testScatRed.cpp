@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
     MPI_Scatter(array, sub_array_size, MPI_INT, sub_array, sub_array_size, MPI_INT, root, MPI_COMM_WORLD);
 
     // Each process computes the square of each element
+    printf("%d\n", sub_array_size);
     for (int i = 0; i < sub_array_size; i++) {
         sub_array[i] = sub_array[i] * sub_array[i];
     }

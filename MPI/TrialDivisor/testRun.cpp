@@ -25,6 +25,7 @@ int main(int argc, char** argv)
     }
     MPI_Bcast(&number, 1, MPI_INT, 0, MPI_COMM_WORLD);
     printf("Process %d recieved data : %d\n", world_rank, number);
+    
     MPI_Finalize();
     return 0;
 }
