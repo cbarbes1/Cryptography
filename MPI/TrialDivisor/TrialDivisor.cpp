@@ -3,75 +3,91 @@
 #include <cmath>
 #include <vector>
 
+void get_range(int number, int world_rank, int world_size, int *start, int *size)
+{
+    *start = number / world_size * (world_rank - 1) + 2;
+    *size = number / world_size;
+    if (world_rank == world_size - 1)
+    {
+        size += number % world_size;
+    }
+}
 
-//vector<int> factor_range(int, int, int); // function to factor numbers in a given range
-
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     srand(time(0));
+
+    if (argc != 2)
+    {
+        printf("Insufficient Argument's");
+        exit(0);
+    }
+
+    // initialize MPI
     int world_size, world_rank;
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-    // int number = static_cast<int>(sqrt(atoi(argv[1])));
-    // int range_size = number / world_size;
-    // int start = world_rank + (range_size*world_rank) + 1;
-    // int end = range_size + (world_rank*range_size);
+    // initialize local vars
+    std::vector<int> number;
+    int size;
+    int range_size;
+    int start;
 
-    if(argc != 2){
-        printf("Insufficient Argument's");
-        exit(0);
+    // if parent then add number parameter sqrt and the number
+    // save the size
+    if (world_rank == 0)
+    {
+        number.push_back(atoi(argv[1]));
+        number.push_back(static_cast<int>(sqrt(atoi(argv[1]))));
+        size = static_cast<int>(number.size());
     }
 
-    // The root process defines the array to be scattered
-    int root = 0;
-    
-    int *array = NULL;
-    
-    int *sub_array = (int*) malloc(sizeof(int)*1);
-    int *result_array = NULL;
-    int number = static_cast<int>(sqrt(atoi(argv[1])));
-    
+    // broadcast the size of the vector so each child knows how big to make the vector
+    MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    if (world_rank == root) {
-        array = (int*) malloc(sizeof(int) * world_size);
-        result_array = (int*) malloc(sizeof(int) * world_size);
-        int range = number / world_size;
-        int end = number;
-        // Initialize the array with the test factors
-        for (int i = 0; i <world_size; i++) {
-            // end = end-range;
-            array[i] = rand()%(end)+1;
-            
-        }
+    // change size to the given size
+    if (world_rank != 0)
+    {
+        number.resize(size);
     }
 
-    // Scatter the array to all processes
-    MPI_Scatter(array, 1, MPI_INT, sub_array, 1, MPI_INT, root, MPI_COMM_WORLD);
-    
-    // for (int i = 0; i < sub_array_size; i++) {
+    // send the data and children recieve
+    MPI_Bcast(number.data(), size, MPI_INT, 0, MPI_COMM_WORLD);
+    // get the ranges that the children will test for factor
+    if (world_rank != 0)
+    {
+        get_range(number[1], world_rank, world_size, &start, &range_size);
+        printf("Here is my start and my size: %d %d\n", start, range_size);
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (world_rank == 0)
+    {
+        int test;
+        MPI_Status status;
+        MPI_Recv(&test, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
         
-    // if(number%sub_array[world_rank-1] != 0){
-    //     sub_array[world_rank-1] = 0;
-    // }
-
-    // Gather the results back to the root process
-    MPI_Gather(sub_array, 1, MPI_INT, result_array, 1, MPI_INT, root, MPI_COMM_WORLD);
-
-    // Root process prints the result
-    if (world_rank == root) {
-        printf("Result array:\n");
-        for (int i = 0; i < world_size; i++) {
-            printf("%d ", result_array[i]);
+        printf("Recieved %d from rank %d \n", test, status.MPI_SOURCE);
+        MPI_Abort(MPI_COMM_WORLD, 0);
+    }
+    else if (world_rank == 1)
+    {
+        int factor = -1;
+        bool found = false;
+        for (int i = start; i <= (start + range_size - 1) && !found; i++)
+        {
+            if (number[0] % i == 0)
+            {
+                factor = i;
+                found = true;
+            }
         }
-        printf("\n");
-
-        free(array);
-        free(result_array);
+        printf("I am rank %d sending %d\n", world_rank, factor);
+        MPI_Send(&factor, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
 
-    free(sub_array);
-    
     MPI_Finalize();
 }
