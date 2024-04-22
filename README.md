@@ -1,25 +1,36 @@
 # Cryptography
 
+<img src="https://github.com/cbarbes1/Cryptography/assets/115114714/b8f43d69-ed55-4f7b-8958-3ae6328f7f53" height=300 />
+
+
 ## Language chosen: C++
 The reason for the use of c++ is for ease of parallelism
 
 ## Semester Project
 - Cluster setup with head node and 4 worker nodes
 - Obtained document on setting up cluster
-- Read about Different potential task that can be completed by the cluster
-- 
+- Use the Cluster to Factor Numbers using elementary techniques in Comparison to Elliptic Curve Factorization
 
-## Homework 4
-Create 6 functions:
-- Modulo function that works for positive and negative numbers
-    - divide the number by n and subtract the result from the number
-    - if negative add the n to the number until positive and run the above
-- GCD function
-    - Given 2 numbers: find the Greatest Common Divisor
-    - Run the euclidian algorithm, The number that is left Rn is the divisor
-- GCDEX function to find s and t form the equation m*s + n*t = 1
-    - 
-- Modular inverse function to find a^(-1) mod n
-    - 
-- Chinese Remainder Theorem function
-- A power mod function, powmod(a,b,n) calculates a^b mod n
+## Cluster Setup Instructions
+
+
+### Status Check
+```bash
+systemctl status nfs-server
+
+```
+### restart server
+```
+sudo systemctl restart nfs-server
+
+```
+
+### Cyclic Dependency
+
+```bash
+sudo nano /etc/exports
+# comment out: Cloud file that holds executables
+sudo systemctl daemon-reload
+sudo systemctl start nfs-server
+
+```
