@@ -2,14 +2,19 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <stdlib.h>
+#include <string.h>
+#include "../InfInt.h"
+#include "omp.h"
 
-void get_range(int number, int world_rank, int world_size, int *start, int *size)
+
+void get_range(InfInt number, int world_rank, int world_size, InfInt *start, InfInt *size)
 {
-    *start = number / world_size * (world_rank - 1) + 2;
+    *start = number / world_size * (world_rank) + 2;
     *size = number / world_size;
     if (world_rank == world_size - 1)
     {
-        size += number % world_size;
+        *size += number % world_size;
     }
 }
 
@@ -17,77 +22,71 @@ int main(int argc, char **argv)
 {
     srand(time(0));
 
+    
     if (argc != 2)
     {
         printf("Insufficient Argument's");
-        exit(0);
+        MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
     // initialize MPI
-    int world_size, world_rank;
-    MPI_Init(&argc, &argv);
+    int world_size, world_rank, provided;
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+
+    // Check the level of thread support provided
+    if (provided < MPI_THREAD_MULTIPLE) {
+        printf("The MPI implementation does not support MPI_THREAD_MULTIPLE\n");
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-    // initialize local vars
-    std::vector<int> number;
-    int size;
-    int range_size;
-    int start;
+    #pragma omp parallel default(none) shared(world_rank, world_size)
+    {
+        int thread_id = omp_get_thread_num();
+        int num_threads = omp_get_num_threads();
+        printf("Hello from thread %d out of %d in process %d out of %d\n", thread_id, num_threads, world_rank, world_size);
+    }
+    
+    int size = strlen(argv[1])+1;
+    char number[size];
+    InfInt range_size;
+    InfInt start;
+    bool found = false;
 
     // if parent then add number parameter sqrt and the number
     // save the size
     if (world_rank == 0)
     {
-        number.push_back(atoi(argv[1]));
-        number.push_back(static_cast<int>(sqrt(atoi(argv[1]))));
-        size = static_cast<int>(number.size());
+        strcpy(number, argv[1]);
+        std::cout<<number<<std::endl;
     }
-
-    // broadcast the size of the vector so each child knows how big to make the vector
-    MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-    // change size to the given size
-    if (world_rank != 0)
-    {
-        number.resize(size);
-    }
-
     // send the data and children recieve
-    MPI_Bcast(number.data(), size, MPI_INT, 0, MPI_COMM_WORLD);
-    // get the ranges that the children will test for factor
-    if (world_rank != 0)
-    {
-        get_range(number[1], world_rank, world_size, &start, &range_size);
-        printf("Here is my start and my size: %d %d\n", start, range_size);
-    }
+    MPI_Bcast(number, size, MPI_CHAR, 0, MPI_COMM_WORLD);
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    // print check for problems later on 
+    InfInt n_value = std::string(number);
+    // std::cout<<n_value<<std::endl;
 
-    if (world_rank == 0)
+    //get the ranges that the processes will test for factor
+    get_range(n_value, world_rank, world_size, &start, &range_size);
+    printf("Here is my start and my size: %s %s\n", start.toString().c_str(), range_size.toString().c_str());
+
+    InfInt factor = -1;
+    for (InfInt i = start; i <= (start + range_size - 1) && !found; i++)
     {
-        int test;
-        MPI_Status status;
-        MPI_Recv(&test, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
-        
-        printf("Recieved %d from rank %d \n", test, status.MPI_SOURCE);
-        MPI_Abort(MPI_COMM_WORLD, 0);
-    }
-    else if (world_rank == 1)
-    {
-        int factor = -1;
-        bool found = false;
-        for (int i = start; i <= (start + range_size - 1) && !found; i++)
+        if (n_value % i == 0)
         {
-            if (number[0] % i == 0)
-            {
-                factor = i;
-                found = true;
-            }
+            factor = i;
+            found = true;
         }
-        printf("I am rank %d sending %d\n", world_rank, factor);
-        MPI_Send(&factor, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
+    std::string temp = factor.toString();
+    strcpy(number, temp.c_str());
+    printf("I am rank %d sending %s\n", world_rank, number);
+    MPI_Abort(MPI_COMM_WORLD, 1);
+    // MPI_Bcast(number, )
+    
 
     MPI_Finalize();
 }
