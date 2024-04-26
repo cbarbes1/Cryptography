@@ -4,10 +4,10 @@ OBJS = TrialDivisor.o
 FLAGS = -fopenmp
 
 $(PROG) : $(OBJS)
-	$(CC) -o $(PROG) $(OBJS)
+	$(CC) $(FLAGS) -o $(PROG) $(OBJS)
 
 TrialDivisor.o : TrialDivisor.cpp
-	$(CC) -c TrialDivisor.cpp
+	$(CC) $(FLAGS) -c TrialDivisor.cpp
 
 clean:
 	rm -f core $(PROG) $(OBJS)
