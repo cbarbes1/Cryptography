@@ -30,23 +30,17 @@ int main(int argc, char **argv)
     }
 
     // initialize MPI
-    int world_size, world_rank, provided;
-    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-
-    // Check the level of thread support provided
-    if (provided < MPI_THREAD_MULTIPLE) {
-        printf("The MPI implementation does not support MPI_THREAD_MULTIPLE\n");
-        MPI_Abort(MPI_COMM_WORLD, 1);
-    }
+    int world_size, world_rank;
+    MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-    #pragma omp parallel default(none) shared(world_rank, world_size)
-    {
-        int thread_id = omp_get_thread_num();
-        int num_threads = omp_get_num_threads();
-        printf("Hello from thread %d out of %d in process %d out of %d\n", thread_id, num_threads, world_rank, world_size);
-    }
+    // #pragma omp parallel default(none) shared(world_rank, world_size)
+    // {
+    //     int thread_id = omp_get_thread_num();
+    //     int num_threads = omp_get_num_threads();
+    //     printf("Hello from thread %d out of %d in process %d out of %d\n", thread_id, num_threads, world_rank, world_size);
+    // }
     
     int size = strlen(argv[1])+1;
     char number[size];
@@ -70,7 +64,8 @@ int main(int argc, char **argv)
 
     //get the ranges that the processes will test for factor
     get_range(n_value, world_rank, world_size, &start, &range_size);
-    printf("Here is my start and my size: %s %s\n", start.toString().c_str(), range_size.toString().c_str());
+    InfInt end = range_size + start;
+    printf("Here is my start and my size: %s %s %s\n", start.toString().c_str(), end.toString().c_str(),range_size.toString().c_str());
 
     InfInt factor = -1;
     for (InfInt i = start; i <= (start + range_size - 1) && !found; i++)

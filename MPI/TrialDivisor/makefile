@@ -1,7 +1,6 @@
 PROG = mpiprog
 CC = mpic++ 
 OBJS = TrialDivisor.o 
-FLAGS = -fopenmp
 
 $(PROG) : $(OBJS)
 	$(CC) $(FLAGS) -o $(PROG) $(OBJS)
