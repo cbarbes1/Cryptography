@@ -48,6 +48,10 @@ namespace utilities {
 	vector<InfInt> PollardPM1(InfInt n, int bound); // pollard p-1 algorithm 
 
 	vector<InfInt> PollardRho(InfInt n); // pollard rho
+
+	vector<InfInt> utilities::find_point(InfInt b, InfInt c, InfInt n);
+
+	vector<InfInt> EC_Factor(InfInt n);
 }
 
 #endif

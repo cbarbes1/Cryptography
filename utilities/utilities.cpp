@@ -7,8 +7,7 @@
 #include "utilities.h"
 #include <vector>
 #include "InfInt.h"
-#include <map>
-#include <cmath>
+
 using namespace std;
 
 /* Modulus funcion
@@ -120,11 +119,11 @@ InfInt utilities::ModInv(vector<InfInt> args)
 InfInt utilities::CRT(vector<InfInt> values, vector<InfInt> mods, int i)
 {
 	InfInt prod = 1;
-	for(unsigned int i = 0; i<mods.size(); i++)
+	for(int i = 0; i<mods.size(); i++)
 		prod *= mods[i];
 
 	InfInt result = 0;
-	for(unsigned int i = 0; i<mods.size(); i++){
+	for(int i = 0; i<mods.size(); i++){
 		InfInt pp = prod / mods[i];
 		result += (values[i] * ModInv({pp, mods[i]}) * pp);
 	}
@@ -170,9 +169,7 @@ bool utilities::FermatsTest(int p)
 	bool checker = true;
 
 	for(int i = 0; i < 10 && checker != false; i++){
-		int randNum = (rand() % (p-3))+2;
-		InfInt result = PowMod({randNum, p-1, p});
-		cout<<randNum<<result<<endl;
+		InfInt result = PowMod({(rand() % (p-3))+2, p-1, p});
 		if(result != 1)
 			checker = false;
 	}
@@ -326,107 +323,18 @@ vector<InfInt> utilities::DCF(double a, int n)
 	return output;
 }
 
-/* Miller-Rabin Primality Test 
- * Parameters: The number to be tested
- * Return: 1 if the number is probably prime, GCD(b-1, n) if the number is composite
- */
-InfInt utilities::MR_Primality_Test(InfInt n, int t){
-
-	srand(time(0));
-	InfInt m = n-1;
-	int k = 0;
-	InfInt b = 0;
-	InfInt b0 = 0;
-	while(m%2 == 0){
-		m=m/2;
-		k++;
-	}
-	//write n-1 = 2^k*m
-	for(int i = 0; i<t; i++){
+vector<InfInt> utilities::find_point(InfInt b, InfInt c, InfInt n)
+{
+	bool find = false;
+	for(InfInt i = 1; i<n && !find; i++){
+		InfInt y = MOD({i*i + b*i + c, n});
 		
-		InfInt randInt = rand()%t+1;
-
-		// b0 = a^m(mod n)
-		b = PowMod({randInt, m, n});
-		b0 = b;
-		
-		// if b0 = +-1(mod n) stop and declare n is prob prime
-		if(b == 1 || b == n-1)
-		 	return 1;
-		// otherwise, 
-
-		for(int j = 1; j<k; j++){
-			//let b1 = b0^2(mod n).
-			b = MOD({(b*b), n});
-			// if b1 = 1 (mod n), then n is composite gcd(b0-1, n) gives a nontrivial factor of n
-			if(b == 1){
-				return GCD({(b0-1), n});
-			}
-			// // if b1 = -1 (mod n), then n is prob prime
-			if(b == n-1)
-				return 1;
-			// otherwise, let b2 = b1^2(mod n) 
-			// if b2 = 1 (mod n) then n is composite
-			// if b2 = -1 (mod n) then n is prob prime
-			// continue until bk-1, if bk-1 != -1 (mod n) then n is composite
-			b0 = b;
-		}
 	}
-	return -1;
 }
 
-/* 
-*	Pollard p-1 algorithm 
-*	Parameters: A number n to factor
-*	Return: A factor or -1 on failure
-*	Notes: pollard p-1 takes a number a and does the following a^(B!)(mod n) for a >1 and B 
-*/
-
-vector<InfInt> utilities::PollardPM1(InfInt n, int bound = INFINITY){
-	InfInt result = 2;
-	InfInt p = 1;
-	InfInt q = 1;
-	bool stop = false;
-	// from i = 2 -> i < bound
-	for(int i = 2; i<bound && !stop; i++){
-		result = PowMod({result, i, n});
-		p = GCD({result-1, n});
-
-		// if the result is a non-trivial factor then get the other factor and terminate
-		if(p > 1 && p < n){
-			stop = true;
-			q = n/p;
-		}
-	}
-
-	if(stop){ // if found then return the 2 factors
-		return {p, q};
-	}else return {-1};
-}
-/*	Pollard rho algorithm that uses cycle detection 
-*	Parameters: The number to be factored
-*	Return: the 2 factors if found and -1 if not found
-*/
-vector<InfInt> utilities::PollardRho(InfInt n){
-	InfInt x = "2", y = x, result = 0, q=0;
-	
-	int finder = 0;
-	while(finder != 1){
-		// floyds cycle detection f(x)
-		x = MOD({(x*x + 1), n}); 
-		// f(f(y))
-		y = MOD({((y*y + 1)*(y*y + 1) +1), n});
-
-		// if x-y is positive then use that, if negative then negate it
-		result = GCD({x-y > 0 ? x-y : -(x-y), n});
-		if(result > 1 && result < n){
-			finder = 1;
-			q = n/result;
-		}
-	}
-	// if success return the factors
-	if(finder == 1)
-		return {result, q};
-	else
-		return {-1};
+vector<InfInt> utilities::EC_Factor(InfInt n)
+{
+	InfInt x, y, b, c;
+	b = rand()%n.toInt();
+	c = 
 }
