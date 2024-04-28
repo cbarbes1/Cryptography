@@ -43,11 +43,17 @@ namespace utilities {
 
 	vector<InfInt> DCF(double, int);
 
-	InfInt MR_Primality_Test(InfInt n, int t);
+	bool MR_Primality_Test(InfInt n, int t);
 
 	vector<InfInt> PollardPM1(InfInt n, int bound); // pollard p-1 algorithm 
 
 	vector<InfInt> PollardRho(InfInt n); // pollard rho
+
+	vector<InfInt> get_curve(InfInt n);
+
+	InfInt ec_factor(InfInt n, InfInt max = 1000);
+
+	
 }
 
 #endif

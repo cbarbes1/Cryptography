@@ -9,6 +9,7 @@
 #include "InfInt.h"
 #include <map>
 #include <cmath>
+#include <exception>
 using namespace std;
 
 /* Modulus funcion
@@ -228,13 +229,24 @@ bool utilities::prim_root(InfInt a, InfInt n)
 vector<InfInt> utilities::MOD_SQRT(InfInt a, InfInt p)
 {
 	vector<InfInt> output;
-	InfInt mod = MOD({p, 4});
-	if(LegendreSymbol(a, p) == -1 || mod != 3){
-		output.push_back(-1);
+
+	bool prime = false;
+
+	prime = MR_Primality_Test(p, 1000);
+
+	if(prime){
+		InfInt mod = MOD({p, 4});
+		if(LegendreSymbol(a, p) == -1 || mod != 3){
+			InfInt x = PowMod({MOD({-a, p}), (p+1)/4, p});
+			output.push_back(x);
+			output.push_back(-x);
+		}else{
+			InfInt x = PowMod({a, (p+1)/4, p});
+			output.push_back(x);
+			output.push_back(-x);
+		}
 	}else{
-		InfInt x = PowMod({a, (p+1)/4, p});
-		output.push_back(x);
-		output.push_back(-x);
+		output.push_back(-1);
 	}
 	return output;
 }
@@ -330,19 +342,22 @@ vector<InfInt> utilities::DCF(double a, int n)
  * Parameters: The number to be tested
  * Return: 1 if the number is probably prime, GCD(b-1, n) if the number is composite
  */
-InfInt utilities::MR_Primality_Test(InfInt n, int t){
+bool utilities::MR_Primality_Test(InfInt n, int t){
 
 	srand(time(0));
 	InfInt m = n-1;
 	int k = 0;
 	InfInt b = 0;
 	InfInt b0 = 0;
+	bool check = true;
 	while(m%2 == 0){
 		m=m/2;
 		k++;
 	}
+	check = (k == 1);
 	//write n-1 = 2^k*m
-	for(int i = 0; i<t; i++){
+	bool result = false;
+	for(int i = 0; i<t&&check; i++){
 		
 		InfInt randInt = rand()%t+1;
 
@@ -351,20 +366,26 @@ InfInt utilities::MR_Primality_Test(InfInt n, int t){
 		b0 = b;
 		
 		// if b0 = +-1(mod n) stop and declare n is prob prime
-		if(b == 1 || b == n-1)
-		 	return 1;
+		if(b == 1 || b == n-1){
+			result = true;
+			check = false;
+		}
+		 	
 		// otherwise, 
 
-		for(int j = 1; j<k; j++){
+		for(int j = 1; j<k&&check; j++){
 			//let b1 = b0^2(mod n).
 			b = MOD({(b*b), n});
 			// if b1 = 1 (mod n), then n is composite gcd(b0-1, n) gives a nontrivial factor of n
 			if(b == 1){
-				return GCD({(b0-1), n});
+				result = false;
+				check = false;
 			}
 			// // if b1 = -1 (mod n), then n is prob prime
-			if(b == n-1)
-				return 1;
+			if(b == n-1){
+				result = true;
+				check = false;
+			}
 			// otherwise, let b2 = b1^2(mod n) 
 			// if b2 = 1 (mod n) then n is composite
 			// if b2 = -1 (mod n) then n is prob prime
@@ -372,7 +393,7 @@ InfInt utilities::MR_Primality_Test(InfInt n, int t){
 			b0 = b;
 		}
 	}
-	return -1;
+	return result;
 }
 
 /* 
@@ -429,4 +450,82 @@ vector<InfInt> utilities::PollardRho(InfInt n){
 		return {result, q};
 	else
 		return {-1};
+}
+
+/*
+* Create an elliptic random elliptic curve mod n
+* given a number n find a point P then find the curve that it lies on
+*/
+vector<InfInt> utilities::get_curve(InfInt n)
+{
+	srand(time(0));
+	InfInt x, y, b, c;
+
+	x = MOD({rand(), n});
+	y = MOD({rand(), n});
+	b = MOD({rand(), n});
+
+	InfInt result = x*x*x + x*b;
+	InfInt y2 = PowMod({y, 2, n});
+	c = MOD({y2 - result, n});
+
+	bool found = (y2 == MOD({result+c, n}));
+	vector<InfInt> res;
+
+	if(found){
+		res = {b, c, x, y};
+	}else{
+		res = {-1};
+	}
+
+	return res;
+}
+
+/*
+* Factoring algorithm that harnesses the elliptic curve factoring method
+* a point P is chosen and an elliptic curve that the point exists on is found 
+* the algorithm then tests different curves to find a factor of n
+* parameters: The number being factored n and the max factorial
+*/
+InfInt utilities::ec_factor(InfInt n, InfInt max)
+{
+	InfInt result = 1;
+	// curve returns b, c, x, y
+	bool tester = false;
+
+	// while(result == 1){
+		vector<InfInt> curve = get_curve(n);
+		// if the curve getter fails try again until it succeeds
+		while(curve[0] == -1)
+			curve = get_curve(n);
+		// initial tangent line addition
+		InfInt d1 = MOD({((curve[2]*curve[2]*curve[2]*3) + curve[0]), n});
+		InfInt d2 = MOD({curve[3]*2, n});
+		result = GCD({d2, n});
+		InfInt m, x, y;
+
+		if(result != 1){
+			tester = true;
+		}else{
+			m = d1*ModInv({d2, n});
+			x = MOD({m*m - curve[0] - curve[1], n});
+			y = MOD({m*(curve[0]- x) - curve[1], n});
+		}
+		for(InfInt i = 3; i<max && !tester; i++){
+			d1 = MOD({y - curve[1], n});
+			d2 = MOD({x - curve[0], n});
+
+			result = GCD({d2, n});
+			if(result != 1){
+				tester = true;
+			}else{
+				m = d1*ModInv({d2, n});
+				x = MOD({m*m - curve[0] - curve[1], n});
+				y = MOD({m*(curve[0]- x) - curve[1], n});
+			}
+
+		}
+	// }
+
+	return result;
 }
