@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     strcpy(number, temp.c_str());
     printf("I am rank %d sending %s\n", world_rank, number);
     MPI_Abort(MPI_COMM_WORLD, 1);
-    // MPI_Bcast(number, )
+    
     
 
     MPI_Finalize();

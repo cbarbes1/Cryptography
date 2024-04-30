@@ -2,11 +2,11 @@
 
 PROG = Prog
 CC = g++
-CPPFLAGS = -g -Wall -std=c++11
+CPPFLAGS = -g -Wall -std=c++11 -fopenmp
 OBJS =  main.o utilities.o
 
 $(PROG) : $(OBJS)
-	$(CC) -o $(PROG) $(OBJS)
+	$(CC) $(CPPFLAGS) -o $(PROG) $(OBJS)
 
 utilities.o : utilities.h utilities.cpp InfInt.h
 	$(CC) $(CPPFLAGS) -c utilities.cpp

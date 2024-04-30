@@ -43,15 +43,24 @@ namespace utilities {
 
 	vector<InfInt> DCF(double, int);
 
-	InfInt MR_Primality_Test(InfInt n, int t);
+	bool MR_Primality_Test(InfInt n, int t);
 
 	vector<InfInt> PollardPM1(InfInt n, int bound); // pollard p-1 algorithm 
 
 	vector<InfInt> PollardRho(InfInt n); // pollard rho
 
+<<<<<<< HEAD
 	vector<InfInt> utilities::find_point(InfInt b, InfInt c, InfInt n);
 
 	vector<InfInt> EC_Factor(InfInt n);
+=======
+	vector<InfInt> get_curve(InfInt b, InfInt x, InfInt y, InfInt n);
+
+	// elliptic curve factoring algorithm which uses the get_curve function to test different curves
+	InfInt ec_factor(InfInt b, InfInt x, InfInt y, InfInt n, InfInt max = 1000);
+
+	
+>>>>>>> fc07ecc7dd3434b2531284cf82e54228e3710e5a
 }
 
 #endif

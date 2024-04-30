@@ -7,7 +7,13 @@
 #include "utilities.h"
 #include <vector>
 #include "InfInt.h"
+<<<<<<< HEAD
 
+=======
+#include <map>
+#include <cmath>
+#include <exception>
+>>>>>>> fc07ecc7dd3434b2531284cf82e54228e3710e5a
 using namespace std;
 
 /* Modulus funcion
@@ -225,13 +231,24 @@ bool utilities::prim_root(InfInt a, InfInt n)
 vector<InfInt> utilities::MOD_SQRT(InfInt a, InfInt p)
 {
 	vector<InfInt> output;
-	InfInt mod = MOD({p, 4});
-	if(LegendreSymbol(a, p) == -1 || mod != 3){
-		output.push_back(-1);
+
+	bool prime = false;
+
+	prime = MR_Primality_Test(p, 1000);
+
+	if(prime){
+		InfInt mod = MOD({p, 4});
+		if(LegendreSymbol(a, p) == -1 || mod != 3){
+			InfInt x = PowMod({MOD({-a, p}), (p+1)/4, p});
+			output.push_back(x);
+			output.push_back(-x);
+		}else{
+			InfInt x = PowMod({a, (p+1)/4, p});
+			output.push_back(x);
+			output.push_back(-x);
+		}
 	}else{
-		InfInt x = PowMod({a, (p+1)/4, p});
-		output.push_back(x);
-		output.push_back(-x);
+		output.push_back(-1);
 	}
 	return output;
 }
@@ -323,6 +340,7 @@ vector<InfInt> utilities::DCF(double a, int n)
 	return output;
 }
 
+<<<<<<< HEAD
 vector<InfInt> utilities::find_point(InfInt b, InfInt c, InfInt n)
 {
 	bool find = false;
@@ -330,6 +348,64 @@ vector<InfInt> utilities::find_point(InfInt b, InfInt c, InfInt n)
 		InfInt y = MOD({i*i + b*i + c, n});
 		
 	}
+=======
+/* Miller-Rabin Primality Test 
+ * Parameters: The number to be tested
+ * Return: 1 if the number is probably prime, GCD(b-1, n) if the number is composite
+ */
+bool utilities::MR_Primality_Test(InfInt n, int t){
+
+	srand(time(0));
+	InfInt m = n-1;
+	int k = 0;
+	InfInt b = 0;
+	InfInt b0 = 0;
+	bool check = true;
+	while(m%2 == 0){
+		m=m/2;
+		k++;
+	}
+	check = (k == 1);
+	//write n-1 = 2^k*m
+	bool result = false;
+	for(int i = 0; i<t&&check; i++){
+		
+		InfInt randInt = rand()%t+1;
+
+		// b0 = a^m(mod n)
+		b = PowMod({randInt, m, n});
+		b0 = b;
+		
+		// if b0 = +-1(mod n) stop and declare n is prob prime
+		if(b == 1 || b == n-1){
+			result = true;
+			check = false;
+		}
+		 	
+		// otherwise, 
+
+		for(int j = 1; j<k&&check; j++){
+			//let b1 = b0^2(mod n).
+			b = MOD({(b*b), n});
+			// if b1 = 1 (mod n), then n is composite gcd(b0-1, n) gives a nontrivial factor of n
+			if(b == 1){
+				result = false;
+				check = false;
+			}
+			// // if b1 = -1 (mod n), then n is prob prime
+			if(b == n-1){
+				result = true;
+				check = false;
+			}
+			// otherwise, let b2 = b1^2(mod n) 
+			// if b2 = 1 (mod n) then n is composite
+			// if b2 = -1 (mod n) then n is prob prime
+			// continue until bk-1, if bk-1 != -1 (mod n) then n is composite
+			b0 = b;
+		}
+	}
+	return result;
+>>>>>>> fc07ecc7dd3434b2531284cf82e54228e3710e5a
 }
 
 vector<InfInt> utilities::EC_Factor(InfInt n)
@@ -338,3 +414,109 @@ vector<InfInt> utilities::EC_Factor(InfInt n)
 	b = rand()%n.toInt();
 	c = 
 }
+<<<<<<< HEAD
+=======
+/*	Pollard rho algorithm that uses cycle detection 
+*	Parameters: The number to be factored
+*	Return: the 2 factors if found and -1 if not found
+*/
+vector<InfInt> utilities::PollardRho(InfInt n){
+	InfInt x = "2", y = x, result = 0, q=0;
+	
+	int finder = 0;
+	while(finder != 1){
+		// floyds cycle detection f(x)
+		x = MOD({(x*x + 1), n}); 
+		// f(f(y))
+		y = MOD({((y*y + 1)*(y*y + 1) +1), n});
+
+		// if x-y is positive then use that, if negative then negate it
+		result = GCD({x-y > 0 ? x-y : -(x-y), n});
+		if(result > 1 && result < n){
+			finder = 1;
+			q = n/result;
+		}
+	}
+	// if success return the factors
+	if(finder == 1)
+		return {result, q};
+	else
+		return {-1};
+}
+
+/*
+* Create an elliptic random elliptic curve mod n
+* given a number n find a point P then find the curve that it lies on
+*/
+vector<InfInt> utilities::get_curve(InfInt b, InfInt x, InfInt y, InfInt n)
+{
+	InfInt c;
+
+	InfInt result = MOD({x*x*x + x*b, n});
+	InfInt y2 = PowMod({y, 2, n});
+	c = MOD({y2 - result, n});
+
+	bool found = (y2 == MOD({result+c, n}));
+	vector<InfInt> res;
+
+	if(found){
+		res = {b, c, x, y};
+	}else{
+		res = {-1};
+	}
+
+	return res;
+}
+
+/*
+* Factoring algorithm that harnesses the elliptic curve factoring method
+* a point P is chosen and an elliptic curve that the point exists on is found 
+* the algorithm then tests different curves to find a factor of n
+* parameters: The number being factored n and the max factorial
+*/
+InfInt utilities::ec_factor(InfInt b, InfInt x, InfInt y, InfInt n, InfInt max)
+{
+	InfInt result = 1;
+	// curve returns b, c, x, y
+	bool tester = false;
+
+	while(result == 1){
+		vector<InfInt> curve = get_curve(b, x, y, n);
+		// if the curve getter fails try again until it succeeds
+		// while(curve[0] == -1)
+		// 	curve = get_curve(n);
+		// initial tangent line addition
+		InfInt d1 = MOD({((curve[2]*curve[2]*curve[2]*3) + curve[0]), n});
+		InfInt d2 = MOD({curve[3]*2, n});
+		result = GCD({d2, n});
+		InfInt m;
+
+		
+		m = d1*ModInv({d2, n});
+		x = MOD({m*m - curve[2] - curve[3], n});
+		y = MOD({m*(curve[2]- x) - curve[3], n});
+
+		cout<<x<<" "<<y<<endl;
+		if(result  == 1){
+			bool tester = false;
+			for(InfInt i = 3; i<max&& !tester; i++){
+				d1 = MOD({y - curve[3], n});
+				d2 = MOD({x - curve[2], n});
+
+
+				result = GCD({d2, n});
+				if(result != 1){
+					tester = true;
+				}else{
+					m = d1*ModInv({d2, n});
+					x = MOD({m*m - curve[2] - curve[3], n});
+					y = MOD({m*(curve[2]- x) - curve[3], n});
+				}
+
+			}
+		}
+	}
+
+	return result;
+}
+>>>>>>> fc07ecc7dd3434b2531284cf82e54228e3710e5a
