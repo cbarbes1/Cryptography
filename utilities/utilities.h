@@ -49,9 +49,10 @@ namespace utilities {
 
 	vector<InfInt> PollardRho(InfInt n); // pollard rho
 
-	vector<InfInt> get_curve(InfInt n);
+	vector<InfInt> get_curve(InfInt b, InfInt x, InfInt y, InfInt n);
 
-	InfInt ec_factor(InfInt n, InfInt max = 1000);
+	// elliptic curve factoring algorithm which uses the get_curve function to test different curves
+	InfInt ec_factor(InfInt b, InfInt x, InfInt y, InfInt n, InfInt max = 1000);
 
 	
 }

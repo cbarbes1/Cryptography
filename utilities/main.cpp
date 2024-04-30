@@ -214,40 +214,51 @@ int main()
 		else
 			cout<<"Pollard Rho failed"<<endl;
 	}else if(type == "GETP"){
-		InfInt n;
-		string ns;
-		cout<<"Please enter a n value for the curve: "<<endl;
-		cin>>ns;
-		n=ns;
+		// InfInt n;
+		// string ns;
+		// cout<<"Please enter a n value for the curve: "<<endl;
+		// cin>>ns;
+		// n=ns;
 
-		vector<InfInt> test = get_curve(n);
+		// vector<InfInt> test = get_curve(n);
 
-		cout<<"here is the b value for the curve "<<test[0]<<" and the c value "<<test[1]<<" with point P = ("<<test[2]<<", "<<test[3]<<")"<<endl;
+		// cout<<"here is the b value for the curve "<<test[0]<<" and the c value "<<test[1]<<" with point P = ("<<test[2]<<", "<<test[3]<<")"<<endl;
 		
 	}else if(type == "EF"){
-		InfInt n;
-		string ns;
+		InfInt n, x, y, b;
+		string ns, xs, ys, bs;
 		cout<<"Please enter a n value to factor: "<<endl;
 		cin>>ns;
 		n=ns;
 
+		cout<<"Please enter the x value: "<<endl;
+		cin>>xs;
+		x = xs;
+		cout<<"Please enter the y value: "<<endl;
+		cin>>ys;
+		y = ys;
+		cout<<"Please enter the b value: "<<endl;
+		cin>>bs;
+		b = bs;
+
 		InfInt factor;
-		bool stop = false;
+		// bool stop = false;
 
-		#pragma omp parallel shared(stop)
-		{
-			while((factor = ec_factor(n)) == 1){
-				if(stop){
-					break;
-				}
-			}
+		// #pragma omp parallel shared(stop)
+		// {
+		// 	while((factor = ec_factor(n)) == 1){
+		// 		if(stop){
+		// 			break;
+		// 		}
+		// 	}
 
-			#pragma omp critical
-			{
-				if(factor != 1)
-					stop = true;
-			}
-		}
+		// 	#pragma omp critical
+		// 	{
+		// 		if(factor != 1)
+		// 			stop = true;
+		// 	}
+		// }
+		factor = ec_factor(b, x, y, n);
 
 		cout<<n<<" = "<<factor<<" * "<<n/factor<<endl;
 	}
