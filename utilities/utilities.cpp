@@ -7,13 +7,10 @@
 #include "utilities.h"
 #include <vector>
 #include "InfInt.h"
-<<<<<<< HEAD
 
-=======
 #include <map>
 #include <cmath>
 #include <exception>
->>>>>>> fc07ecc7dd3434b2531284cf82e54228e3710e5a
 using namespace std;
 
 /* Modulus funcion
@@ -340,15 +337,6 @@ vector<InfInt> utilities::DCF(double a, int n)
 	return output;
 }
 
-<<<<<<< HEAD
-vector<InfInt> utilities::find_point(InfInt b, InfInt c, InfInt n)
-{
-	bool find = false;
-	for(InfInt i = 1; i<n && !find; i++){
-		InfInt y = MOD({i*i + b*i + c, n});
-		
-	}
-=======
 /* Miller-Rabin Primality Test 
  * Parameters: The number to be tested
  * Return: 1 if the number is probably prime, GCD(b-1, n) if the number is composite
@@ -405,17 +393,37 @@ bool utilities::MR_Primality_Test(InfInt n, int t){
 		}
 	}
 	return result;
->>>>>>> fc07ecc7dd3434b2531284cf82e54228e3710e5a
 }
 
-vector<InfInt> utilities::EC_Factor(InfInt n)
-{
-	InfInt x, y, b, c;
-	b = rand()%n.toInt();
-	c = 
+/* 
+*	Pollard p-1 algorithm 
+*	Parameters: A number n to factor
+*	Return: A factor or -1 on failure
+*	Notes: pollard p-1 takes a number a and does the following a^(B!)(mod n) for a >1 and B 
+*/
+
+vector<InfInt> utilities::PollardPM1(InfInt n, int bound = INFINITY){
+	InfInt result = 2;
+	InfInt p = 1;
+	InfInt q = 1;
+	bool stop = false;
+	// from i = 2 -> i < bound
+	for(int i = 2; i<bound && !stop; i++){
+		result = PowMod({result, i, n});
+		p = GCD({result-1, n});
+
+		// if the result is a non-trivial factor then get the other factor and terminate
+		if(p > 1 && p < n){
+			stop = true;
+			q = n/p;
+		}
+	}
+
+	if(stop){ // if found then return the 2 factors
+		return {p, q};
+	}else return {-1};
 }
-<<<<<<< HEAD
-=======
+
 /*	Pollard rho algorithm that uses cycle detection 
 *	Parameters: The number to be factored
 *	Return: the 2 factors if found and -1 if not found
@@ -448,10 +456,14 @@ vector<InfInt> utilities::PollardRho(InfInt n){
 * Create an elliptic random elliptic curve mod n
 * given a number n find a point P then find the curve that it lies on
 */
-vector<InfInt> utilities::get_curve(InfInt b, InfInt x, InfInt y, InfInt n)
+vector<InfInt> utilities::get_curve(InfInt n)
 {
 	InfInt c;
 
+	InfInt x = MOD({rand(), n});
+	InfInt y = MOD({rand(), n});
+
+	InfInt b = MOD({rand(), n});
 	InfInt result = MOD({x*x*x + x*b, n});
 	InfInt y2 = PowMod({y, 2, n});
 	c = MOD({y2 - result, n});
@@ -474,49 +486,54 @@ vector<InfInt> utilities::get_curve(InfInt b, InfInt x, InfInt y, InfInt n)
 * the algorithm then tests different curves to find a factor of n
 * parameters: The number being factored n and the max factorial
 */
-InfInt utilities::ec_factor(InfInt b, InfInt x, InfInt y, InfInt n, InfInt max)
+InfInt utilities::ec_factor(InfInt n, InfInt max)
 {
-	InfInt result = 1;
+	InfInt result = 1, x1, y1, x, y, m;
 	// curve returns b, c, x, y
 	bool tester = false;
 
-	while(result == 1){
-		vector<InfInt> curve = get_curve(b, x, y, n);
+	// while(result == 1){
+		vector<InfInt> curve = get_curve(n);
 		// if the curve getter fails try again until it succeeds
-		// while(curve[0] == -1)
-		// 	curve = get_curve(n);
+		while(curve[0] == -1)
+			curve = get_curve(n);
 		// initial tangent line addition
-		InfInt d1 = MOD({((curve[2]*curve[2]*curve[2]*3) + curve[0]), n});
+		InfInt d1 = MOD({((curve[2]*curve[2]*3) + curve[0]), n});
 		InfInt d2 = MOD({curve[3]*2, n});
+
+		// make sure the gcd is 1 before inverting
 		result = GCD({d2, n});
-		InfInt m;
-
-		
-		m = d1*ModInv({d2, n});
-		x = MOD({m*m - curve[2] - curve[3], n});
-		y = MOD({m*(curve[2]- x) - curve[3], n});
-
-		cout<<x<<" "<<y<<endl;
-		if(result  == 1){
-			bool tester = false;
-			for(InfInt i = 3; i<max&& !tester; i++){
-				d1 = MOD({y - curve[3], n});
-				d2 = MOD({x - curve[2], n});
-
-
+		if(result != 1){
+			tester = true;
+		}else{
+			m = d1*ModInv({d2, n});
+			// find the x and y points using the slope equation
+			x = MOD({m*m - curve[2] - curve[2], n});
+			y = MOD({m*(curve[2]-x) - curve[3], n});
+			x1 = curve[2];
+			y1 = curve[3];
+		}
+		for(InfInt i = 3; i<max&& !tester; i++){
+			for(InfInt j = 0; j < i&& !tester; j++){
+				InfInt x2, y2;
+				// find the 
+				d2 = MOD({(x - x1), n});
+				d1 = MOD({y - y1, n});
 				result = GCD({d2, n});
+
 				if(result != 1){
 					tester = true;
 				}else{
 					m = d1*ModInv({d2, n});
-					x = MOD({m*m - curve[2] - curve[3], n});
-					y = MOD({m*(curve[2]- x) - curve[3], n});
+					x2 = x;
+					y2 = y;
+					x = MOD({m*m - x - x1, n});
+					y = MOD({m*(x1-x) - y1, n});
+					x1 = x2;
+					y1 = y2;
 				}
-
 			}
 		}
-	}
 
 	return result;
 }
->>>>>>> fc07ecc7dd3434b2531284cf82e54228e3710e5a

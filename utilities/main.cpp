@@ -4,9 +4,10 @@
  */
 #include "utilities.h"
 #include <omp.h>
-
+#include <chrono>
 using namespace std;
 using namespace utilities;
+using namespace std::chrono;
 
 /*
 */
@@ -14,7 +15,7 @@ int main()
 {
 	srand(time(0));
 	string type;
-	cout<<"Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD, FermatsTest, EulerPhi, PrimRoot, MODSQRT, LSYM, JSYM, RCF, DCF, MR (Miller-Rabin)), PM1(Pollard p-1), PRHO (Pollard Rho), GETP (Elliptic Curve)"<<endl;
+	cout<<"Choose a function to run (MOD, GCD, GCDEX, MODINV, CRT, POWMOD, FermatsTest, EulerPhi, PrimRoot, MODSQRT, LSYM, JSYM, RCF, DCF, MR (Miller-Rabin)), PM1(Pollard p-1), PRHO (Pollard Rho), EF(Elliptic Curve Factoring)"<<endl;
 	cin>>type;
 	if(type == "MOD"){
 		InfInt value, n;
@@ -197,7 +198,13 @@ int main()
 
 		InfInt num = number;
 		int bound = 100000;
+		auto start = high_resolution_clock::now();
 		vector<InfInt> output = PollardPM1(num, bound);
+		auto stop = high_resolution_clock::now();
+    	auto duration = duration_cast<microseconds>(stop - start);
+    
+    	// output the needed information
+    	cout <<"Time to factor using p-1 : "<< duration.count() / 1000000.0 << " seconds" << endl;
 		if(output[0] != -1)
 			cout<<"The factors of n = "<<num<<" is p = "<<output[0]<<" q = "<<output[1]<<endl;
 		else
@@ -213,52 +220,21 @@ int main()
 			cout<<"The factors of n = "<<num<<" is p = "<<output[0]<<" q = "<<output[1]<<endl;
 		else
 			cout<<"Pollard Rho failed"<<endl;
-	}else if(type == "GETP"){
-		// InfInt n;
-		// string ns;
-		// cout<<"Please enter a n value for the curve: "<<endl;
-		// cin>>ns;
-		// n=ns;
-
-		// vector<InfInt> test = get_curve(n);
-
-		// cout<<"here is the b value for the curve "<<test[0]<<" and the c value "<<test[1]<<" with point P = ("<<test[2]<<", "<<test[3]<<")"<<endl;
-		
 	}else if(type == "EF"){
-		InfInt n, x, y, b;
-		string ns, xs, ys, bs;
+		InfInt n;
+		string ns;
 		cout<<"Please enter a n value to factor: "<<endl;
 		cin>>ns;
 		n=ns;
 
-		cout<<"Please enter the x value: "<<endl;
-		cin>>xs;
-		x = xs;
-		cout<<"Please enter the y value: "<<endl;
-		cin>>ys;
-		y = ys;
-		cout<<"Please enter the b value: "<<endl;
-		cin>>bs;
-		b = bs;
-
 		InfInt factor;
-		// bool stop = false;
-
-		// #pragma omp parallel shared(stop)
-		// {
-		// 	while((factor = ec_factor(n)) == 1){
-		// 		if(stop){
-		// 			break;
-		// 		}
-		// 	}
-
-		// 	#pragma omp critical
-		// 	{
-		// 		if(factor != 1)
-		// 			stop = true;
-		// 	}
-		// }
-		factor = ec_factor(b, x, y, n);
+		auto start = high_resolution_clock::now();
+		factor = ec_factor(n);
+		auto stop = high_resolution_clock::now();
+    	auto duration = duration_cast<microseconds>(stop - start);
+    
+    	// output the needed information
+    	cout <<"Time to factor using Elliptic Curve : "<< duration.count() / 1000000.0 << " seconds" << endl;
 
 		cout<<n<<" = "<<factor<<" * "<<n/factor<<endl;
 	}
