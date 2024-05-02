@@ -34,13 +34,6 @@ int main(int argc, char **argv)
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-
-    // #pragma omp parallel default(none) shared(world_rank, world_size)
-    // {
-    //     int thread_id = omp_get_thread_num();
-    //     int num_threads = omp_get_num_threads();
-    //     printf("Hello from thread %d out of %d in process %d out of %d\n", thread_id, num_threads, world_rank, world_size);
-    // }
     
     int size = strlen(argv[1])+1;
     char number[size];
@@ -70,18 +63,19 @@ int main(int argc, char **argv)
     InfInt factor = -1;
     for (InfInt i = start; i <= (start + range_size - 1) && !found; i++)
     {
+        // if find a factor then set found and set the factor
         if (n_value % i == 0)
         {
             factor = i;
             found = true;
         }
+        
     }
-    std::string temp = factor.toString();
-    strcpy(number, temp.c_str());
-    printf("I am rank %d sending %s\n", world_rank, number);
-    MPI_Abort(MPI_COMM_WORLD, 1);
+    MPI_Bcast(&found, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+    if(factor != -1){
+        std::string temp = factor.toString();
+        printf("I am rank %d sending %s\n", world_rank, temp.c_str());
+    }
     
-    
-
     MPI_Finalize();
 }

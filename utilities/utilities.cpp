@@ -492,7 +492,9 @@ InfInt utilities::ec_factor(InfInt n, InfInt max)
 	// curve returns b, c, x, y
 	bool tester = false;
 
-	// while(result == 1){
+	int count_curves = 0;
+
+	while(result == 1){
 		vector<InfInt> curve = get_curve(n);
 		// if the curve getter fails try again until it succeeds
 		while(curve[0] == -1)
@@ -514,6 +516,7 @@ InfInt utilities::ec_factor(InfInt n, InfInt max)
 			y1 = curve[3];
 		}
 		for(InfInt i = 3; i<max&& !tester; i++){
+			// add the previous point to the next point up to the number
 			for(InfInt j = 0; j < i&& !tester; j++){
 				InfInt x2, y2;
 				// find the 
@@ -534,6 +537,9 @@ InfInt utilities::ec_factor(InfInt n, InfInt max)
 				}
 			}
 		}
+		count_curves++;
+	}
 
+	cout<<"Number of Curves used to factor: "<<count_curves<<endl;
 	return result;
 }

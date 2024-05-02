@@ -229,7 +229,7 @@ int main()
 
 		InfInt factor;
 		auto start = high_resolution_clock::now();
-		factor = ec_factor(n);
+		factor = ec_factor(n, 100);
 		auto stop = high_resolution_clock::now();
     	auto duration = duration_cast<microseconds>(stop - start);
     
