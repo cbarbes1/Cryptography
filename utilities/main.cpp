@@ -32,13 +32,14 @@ int main()
 		vector<InfInt> values;
 		InfInt output;
 		for(int i = 0; i<2; i++){
-			InfInt val;
+			string val;
 			cout<<"Enter a value "<<i<<" :"<<endl;
 			cin>>val;
-			values.push_back(val);
+			InfInt num = val;
+			values.push_back(num);
 		}
 		output = GCD(values);
-		printf("The Greatest Common Denominator GCD(%d, %d) = %d", values[0].toInt(), values[1].toInt(), output.toInt());
+		printf("The Greatest Common Denominator GCD(%s, %s) = %s\n", values[0].toString().c_str(), values[1].toString().c_str(), output.toString().c_str());
 	}else if(type == "GCDEX"){
 
 		vector<InfInt> values;
@@ -229,15 +230,19 @@ int main()
 
 		InfInt factor;
 		auto start = high_resolution_clock::now();
+		bool test = false;
 		factor = ec_factor(n);
 		auto stop = high_resolution_clock::now();
     	auto duration = duration_cast<microseconds>(stop - start);
+
+		cout<<n<<" = "<<factor<<" * "<<n/factor<<endl;
     
     	// output the needed information
     	cout <<"Time to factor using Elliptic Curve : "<< duration.count() / 1000000.0 << " seconds" << endl;
 
-		cout<<n<<" = "<<factor<<" * "<<n/factor<<endl;
+		
 	}
+
 
 	return 0;
 }

@@ -54,7 +54,7 @@ namespace utilities {
 	vector<InfInt> get_curve(InfInt n);
 
 	// elliptic curve factoring algorithm which uses the get_curve function to test different curves
-	InfInt ec_factor(InfInt n, InfInt max  = 1000);
+	InfInt ec_factor(InfInt n, bool &stop, InfInt max  = 1000);
 	
 }
 

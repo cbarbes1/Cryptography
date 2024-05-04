@@ -10,6 +10,7 @@ $(PROG) : $(OBJS)
 
 utilities.o : utilities.h utilities.cpp InfInt.h
 	$(CC) $(CPPFLAGS) -c utilities.cpp
+
 main.o : main.cpp 
 	$(CC) $(CPPFLAGS) -c main.cpp
 
