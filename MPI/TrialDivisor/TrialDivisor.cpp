@@ -39,8 +39,11 @@ int main(int argc, char **argv)
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+<<<<<<< HEAD
 
     double start_time = MPI_Wtime(); // start the timer
+=======
+>>>>>>> baf7bfd6000965c1acb000f4c8ae058088faa6d6
     
     int size = strlen(argv[1])+1;
     char number[size];
@@ -76,19 +79,26 @@ int main(int argc, char **argv)
             factor = i;
             found = true;
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> baf7bfd6000965c1acb000f4c8ae058088faa6d6
         
     }
     MPI_Bcast(&found, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
     if(factor != -1){
         std::string temp = factor.toString();
         printf("I am rank %d sending %s\n", world_rank, temp.c_str());
+<<<<<<< HEAD
         double end_time = MPI_Wtime(); // Stop the timer
         
         std::cout << "Total execution time: " << (end_time - start_time) << " seconds." << std::endl;
     }
 
     
+=======
+    }
+>>>>>>> baf7bfd6000965c1acb000f4c8ae058088faa6d6
     
     MPI_Finalize();
 }

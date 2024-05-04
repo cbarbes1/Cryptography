@@ -230,8 +230,12 @@ int main()
 
 		InfInt factor;
 		auto start = high_resolution_clock::now();
+<<<<<<< HEAD
 		bool test = false;
 		factor = ec_factor(n);
+=======
+		factor = ec_factor(n, 100);
+>>>>>>> baf7bfd6000965c1acb000f4c8ae058088faa6d6
 		auto stop = high_resolution_clock::now();
     	auto duration = duration_cast<microseconds>(stop - start);
 
