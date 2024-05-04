@@ -547,16 +547,9 @@ InfInt utilities::ec_factor(InfInt n, InfInt max)
 	InfInt result = 1, x, y, m, x1, y1;
 	
 	bool tester = false;
-<<<<<<< HEAD
 	int curve_count = 0;
 	while(result == 1){
 		// curve returns b, c, x, y
-=======
-
-	int count_curves = 0;
-
-	while(result == 1){
->>>>>>> baf7bfd6000965c1acb000f4c8ae058088faa6d6
 		vector<InfInt> curve = get_curve(n);
 		// if the curve getter fails try again until it succeeds
 		while (curve[0] == -1)
@@ -577,7 +570,6 @@ InfInt utilities::ec_factor(InfInt n, InfInt max)
 			x1 = curve[2];
 			y1 = curve[3];
 		}
-<<<<<<< HEAD
 
 		
 		for (InfInt i = 3; i < max && !tester; i++)
@@ -611,15 +603,6 @@ InfInt utilities::ec_factor(InfInt n, InfInt max)
 				// regular slope calculation
 				d2 = MOD({(x - x_prev), n});
 				d1 = MOD({y - y_prev, n});
-=======
-		for(InfInt i = 3; i<max&& !tester; i++){
-			// add the previous point to the next point up to the number
-			for(InfInt j = 0; j < i&& !tester; j++){
-				InfInt x2, y2;
-				// find the 
-				d2 = MOD({(x - x1), n});
-				d1 = MOD({y - y1, n});
->>>>>>> baf7bfd6000965c1acb000f4c8ae058088faa6d6
 				result = GCD({d2, n});
 
 				if (result != 1 && result != n)
@@ -635,15 +618,8 @@ InfInt utilities::ec_factor(InfInt n, InfInt max)
 				}
 			}
 		}
-<<<<<<< HEAD
 		curve_count++;
 	}
 	
-=======
-		count_curves++;
-	}
-
-	cout<<"Number of Curves used to factor: "<<count_curves<<endl;
->>>>>>> baf7bfd6000965c1acb000f4c8ae058088faa6d6
 	return result;
 }
