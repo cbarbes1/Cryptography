@@ -6,7 +6,7 @@
 #include <string.h>
 #include "../InfInt.h"
 #include "omp.h"
-#include "../../utilities/utilities.h"
+#include "utilities.h"
 
 using namespace utilities;
 
