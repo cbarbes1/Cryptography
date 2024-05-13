@@ -240,6 +240,14 @@ int main()
     	// output the needed information
     	cout <<"Time to factor using Elliptic Curve : "<< duration.count() / 1000000.0 << " seconds" << endl;
 		
+	}else if(type == "GC"){
+		vector<InfInt> test = get_curve(1961);
+
+		for(unsigned int i = 0; i< test.size();i++){
+			cout<<test[i]<<" ";
+		}
+
+		cout<<endl;
 	}
 
 

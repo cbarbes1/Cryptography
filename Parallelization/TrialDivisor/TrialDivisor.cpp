@@ -48,18 +48,8 @@ int main(int argc, char **argv)
     InfInt start;
     bool found = false;
 
-
-    // get the number
-    if (world_rank == 0)
-    {
-        strcpy(number, argv[1]);
-        std::cout<<number<<std::endl;
-    }
-    // send the data and children recieve
-    MPI_Bcast(number, size, MPI_CHAR, 0, MPI_COMM_WORLD);
-
     // print check for problems later on 
-    InfInt n_value = std::string(number);
+    InfInt n_value = std::string(argv[1]);
     InfInt ceiling = n_value.intSqrt();
 
     //get the ranges that the processes will test for factor
@@ -86,8 +76,6 @@ int main(int argc, char **argv)
         
         std::cout << "Total execution time: " << (end_time - start_time) << " seconds." << std::endl;
     }
-
-    
     
     MPI_Finalize();
 }

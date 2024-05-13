@@ -23,8 +23,7 @@ InfInt utilities::MOD(vector<InfInt> args)
 	InfInt result = args[0];
 	if (args[0] > 0)
 	{
-		result = result / args[1];
-		args[0] -= (result * args[1]);
+		args[0] = args[0]%args[1];
 	}
 	else
 	{
@@ -513,27 +512,16 @@ vector<InfInt> utilities::get_curve(InfInt n)
 {
 	InfInt c;
 
-	InfInt x = MOD({rand(), n});
-	InfInt y = MOD({rand(), n});
+	InfInt x = MOD({rand()*100000+rand(), n});
+	InfInt y = MOD({rand()*100000+rand(), n});
 
-	InfInt b = MOD({rand(), n});
+	InfInt b = MOD({rand()*100000+rand(), n});
 	InfInt result = MOD({x * x * x + x * b, n});
-	InfInt y2 = PowMod({y, 2, n});
+	InfInt y2 = MOD({y*y, n});
 	c = MOD({y2 - result, n});
 
-	bool found = (y2 == MOD({result + c, n}));
 	vector<InfInt> res;
-
-	if (found)
-	{
-		res = {b, c, x, y};
-	}
-	else
-	{
-		res = {-1};
-	}
-
-	return res;
+	return {b, c, x, y};
 }
 
 /*
@@ -544,82 +532,71 @@ vector<InfInt> utilities::get_curve(InfInt n)
  */
 InfInt utilities::ec_factor(InfInt n, InfInt max)
 {
-	InfInt result = 1, x, y, m, x1, y1;
+	//srand(time(0));
+	InfInt result = 1, x, y, m, x1, d1, d2, total_x, total_y;
 	
 	bool tester = false;
 	int curve_count = 0;
 	while(result == 1){
 		// curve returns b, c, x, y
 		vector<InfInt> curve = get_curve(n);
-		// if the curve getter fails try again until it succeeds
-		while (curve[0] == -1)
-			curve = get_curve(n);
+		x = curve[2];
+		y = curve[3];
 
-		InfInt d1 = MOD({((curve[2]*curve[2]*3) + curve[0]), n});
-		InfInt d2 = MOD({curve[3]*2, n});
 
-		// make sure the gcd is 1 before inverting
-		result = GCD({d2, n});
-		if(result != 1){
-			tester = true;
-		}else{
-			m = d1*ModInv({d2, n});
-			// find the x and y points using the slope equation
-			x = MOD({m*m - curve[2] - curve[2], n});
-			y = MOD({m*(curve[2]-x) - curve[3], n});
-			x1 = curve[2];
-			y1 = curve[3];
-		}
-
-		
-		for (InfInt i = 3; i < max && !tester; i++)
+		for (InfInt i = 2; i < max && !tester; i++)
 		{
-			// save x_prev, y_prev for odd addition
-			// even calc 
-			// for loop through each 2 in the number until you reach k <= i;
-			InfInt x_prev = x;
-			InfInt y_prev = y;
-			for(InfInt k = 0; k<i-1 && !tester; k+=2){
-				// Using a tangent line we find the double of each point until we run out of doubles or we find a factor
-				d1 = MOD({((x * x * 3) + curve[0]), n});
-				d2 = MOD({y * 2, n});
-				// make sure the gcd is 1 before inverting
-				result = GCD({d2, n});
-				if (result != 1 && result != n)
-				{
-					tester = true;
+			bool firstTime = true;
+			InfInt k = i;
+			total_x = x;
+			total_y = y;
+			while(k>=1 && !tester){
+				if(firstTime){
+					firstTime = false;
 				}
-				else
-				{
-					m = d1 * ModInv({d2, n});
-					// find the x and y points using the slope equation
-					x1 = x;
-					x = MOD({m * m, n});
-					y = MOD({m * (x1 - x) - y, n});
-				}
-			}
-			// each odd number has one addition after consecutive doubling
-			if(i%2 == 1 && !tester){
-				// regular slope calculation
-				d2 = MOD({(x - x_prev), n});
-				d1 = MOD({y - y_prev, n});
-				result = GCD({d2, n});
+				if (k%2 == 1 || firstTime){
+					//regular slope calculation
+					d2 = MOD({(x - total_x), n});
+					d1 = MOD({y - total_y, n});
+					result = GCD({d2, n});
 
-				if (result != 1 && result != n)
-				{
-					tester = true;
-				}
-				else
-				{
-					m = d1 * ModInv({d2, n});
-					x1 = x;
-					x = MOD({m * m - x - x_prev, n});
-					y = MOD({m * (x1 - x) - y, n});
+					if (result != 1 && result != n)
+					{
+						tester = true;
+					}
+					else
+					{
+						m = d1 * ModInv({d2, n});
+						x1 = total_x;
+						total_x = MOD({m * m - x - total_x, n});
+						total_y = MOD({m * (x - x1) - y, n});
+					}
+					k--;
+				}else{
+					// Using a tangent line we find the double of p
+					d1 = MOD({((x * x * 3) + curve[0]), n});
+					d2 = MOD({y * 2, n});
+					// make sure the gcd is 1 before inverting
+					result = GCD({d2, n});
+					if (result != 1 && result != n)
+					{
+						tester = true;
+					}
+					else
+					{
+						m = d1 * ModInv({d2, n});
+						// find the x and y points using the slope equation
+						x1 = x;
+						x = MOD({m * m - x - x, n});
+						y = MOD({m * (x1-x) - y, n});
+					}
+					k /= 2;
 				}
 			}
+			x = total_x;
+			y = total_y;
 		}
 		curve_count++;
 	}
-	
 	return result;
 }
