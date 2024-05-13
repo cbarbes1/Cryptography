@@ -44,11 +44,13 @@ int main(int argc, char **argv)
 	bool stop = false;
 
 	InfInt curve_count = 1;
-	Point test(1, 3, 10);
+	
 
     #pragma omp parallel shared(stop) 
     {
+        Point test(1, 3, 10);
         while(!stop){
+            
             test.setCurve(rand()*100000+rand(), rand()*100000+rand(), n_value);
             for(InfInt i = 2; i<1000 && !stop; i++){
                 test = i*test;

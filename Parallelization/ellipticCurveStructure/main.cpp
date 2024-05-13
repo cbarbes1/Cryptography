@@ -39,28 +39,23 @@ int main()
 
     bool stop = false;
     auto start = high_resolution_clock::now();
-    while(!stop)
-    {
-        Point test(1, 3, 10);
-        test.setCurve(rand() * 100000 + rand(), rand() * 100000 + rand(), number);
-        for (InfInt i = 2; i < 1000 && !stop; i++)
-        {
-            test = test * i;
-            if (test.getFactor() != 1)
-            {
-                // #pragma omp critical
-                // {
-                stop = true;
-                // }
-                // stop = true;
-            }
-        }
-        // test.setHalt(stop);
-        if (stop)
-        {
-            test.setHalt(stop);
-        }
-    }
+    // while(!stop)
+    // {
+    //     Point test(1, 3, 10);
+    //     test.setCurve(rand() * 100000 + rand(), rand() * 100000 + rand(), number);
+    //     for (InfInt i = 2; i < 1000 && !stop; i++)
+    //     {
+    //         test = test * i;
+    //         if (test.getFactor() != 1)
+    //         {
+    //             stop = true;
+    //         }
+    //     }
+    //     if (stop)
+    //     {
+    //         test.setHalt(stop);
+    //     }
+    // }
 
     auto end = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>(end - start);
@@ -69,6 +64,7 @@ int main()
     cout << "Time to compute with 1 processor: " << duration.count() / 1000000.0 << " seconds" << endl;
 
     stop = false;
+    Point OG(1, 3, 5);
 
     start = high_resolution_clock::now();
     #pragma omp parallel shared(stop)
@@ -80,18 +76,17 @@ int main()
         while (!stop)
         {
             Point test(1, 3, 10);
+            
             test.setCurve(rand() * 100000 + rand(), rand() * 100000 + rand(), number);
+            OG = test;
             for (InfInt i = 2; i < 1000 && !stop; i++)
             {
                 test = test * i;
                 if (test.getFactor() != 1)
                 {
-                    
                     stop = true;
-                    
                 }
             }
-            // test.setHalt(stop);
             if (stop)
             {
                 test.setHalt(stop);
@@ -103,6 +98,7 @@ int main()
     duration = duration_cast<microseconds>(end - start);
 
     // output the needed information
+    
     cout << "Time to compute on : " << duration.count() / 1000000.0 << " seconds" << endl;
     return 0;
 }

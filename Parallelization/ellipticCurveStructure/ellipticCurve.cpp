@@ -188,6 +188,7 @@ Point::Point(InfInt x, InfInt y, InfInt n)
     Y = MOD(y, n);
     curve.resetCurve(x, y, n);
     factor = 1;
+    halt = false;
 }
 
 /*
@@ -216,6 +217,7 @@ void Point::setPoint(InfInt x, InfInt y, InfInt n)
     X = MOD(x, n);
     Y = MOD(y, n);
     curve.resetCurve(x, y, n);
+
 }
 
 /*
@@ -330,9 +332,11 @@ Point Point::operator*(InfInt M)
         if (k % 2 == 1 || firstTime)
         {
             Total = *this + Total;
+            k--;
+        }else{
+            doubleP();
+            k /= 2;
         }
-        doubleP();
-        k /= 2;
         
     }
     return Total;

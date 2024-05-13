@@ -9,7 +9,7 @@ using namespace std::chrono;
 int dot_product(int* v1, int* v2, int size);
 int mp_dot_product(int* v1, int* v2, int size);
 
-int* randomVector(int size, int limit = 10);
+int* randomVector(int size);
 
 int main()
 {
@@ -86,11 +86,11 @@ int mp_dot_product(int* v1, int* v2, int size)
 }
 
 
-int* randomVector(int size, int limit)
+int* randomVector(int size)
 {
     int* v1 = new int[size];
     for(int i = 0; i<size; i++){
-        v1[i] = rand()%limit+1;
+        v1[i] = rand()%1000+1;
     }
     return v1;
 }
